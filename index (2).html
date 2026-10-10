@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tyler Nelson – Financial Analysis Website</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root { --navy:#13294b; --blue:#1f6feb; --light:#f4f6fa; --border:#d5dbe5; --green:#1a7f37; --red:#cf222e; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--light); color:#1c2330; }
+  header { background:var(--navy); color:#fff; padding:18px 24px; }
+  header h1 { margin:0; font-size:1.5rem; }
+  header p { margin:4px 0 0; opacity:.8; font-size:.95rem; }
+  nav { background:#0d1d36; display:flex; flex-wrap:wrap; }
+  nav button { background:none; border:none; color:#cfd8e6; padding:14px 22px; font-size:1rem; cursor:pointer; border-bottom:3px solid transparent; }
+  nav button:hover { color:#fff; }
+  nav button.active { color:#fff; border-bottom-color:var(--blue); font-weight:600; }
+  main { max-width:1100px; margin:0 auto; padding:24px; }
+  .page { display:none; } .page.active { display:block; }
+  .card { background:#fff; border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:20px; }
+  h2 { color:var(--navy); margin-top:0; }
+  h3 { color:var(--navy); margin-bottom:8px; }
+  label { display:block; font-weight:600; margin:10px 0 4px; font-size:.9rem; }
+  input, textarea, select { width:100%; padding:8px; border:1px solid var(--border); border-radius:5px; font-family:inherit; font-size:.9rem; }
+  textarea { height:90px; font-family:Consolas,monospace; font-size:.75rem; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+  .btn { background:var(--blue); color:#fff; border:none; padding:10px 20px; border-radius:5px; font-size:1rem; cursor:pointer; margin-top:14px; margin-right:8px; }
+  .btn.secondary { background:#6e7781; }
+  .btn.small { padding:6px 12px; font-size:.85rem; margin-top:6px; }
+  .drop { border:2px dashed var(--border); border-radius:8px; padding:18px 10px; text-align:center; cursor:pointer; background:var(--light); transition:.15s; }
+  .drop:hover, .drop.over { border-color:var(--blue); background:#eaf2ff; }
+  .drop .big { font-size:1.6rem; }
+  .drop .st { font-size:.85rem; margin-top:6px; color:#57606a; }
+  .drop.loaded { border-style:solid; border-color:var(--green); background:#eefbf1; }
+  .drop.loaded .st { color:var(--green); font-weight:600; }
+  details { margin-top:8px; font-size:.85rem; }
+  summary { cursor:pointer; color:var(--blue); }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .presets button { background:#eaf0f8; border:1px solid var(--border); border-radius:14px; padding:4px 12px; cursor:pointer; font-size:.85rem; }
+  .presets button:hover { background:var(--blue); color:#fff; }
+  .steps { background:#eaf2ff; border-left:4px solid var(--blue); padding:10px 16px; border-radius:4px; font-size:.9rem; }
+  .steps ol { margin:6px 0; padding-left:20px; } .steps li { margin:3px 0; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; font-size:.92rem; }
+  th, td { border:1px solid var(--border); padding:8px 10px; text-align:right; }
+  th { background:#eaf0f8; } td:first-child, th:first-child { text-align:left; }
+  .tablewrap { overflow-x:auto; }
+  .metric { background:var(--light); border-radius:6px; padding:14px; text-align:center; }
+  .metric .v { font-size:1.4rem; font-weight:700; color:var(--navy); }
+  .metric .l { font-size:.8rem; color:#57606a; }
+  .note { font-size:.85rem; color:#57606a; }
+  .error { color:var(--red); font-weight:600; }
+  .banner { background:#fff8c5; border:1px solid #d4a72c; padding:8px 12px; border-radius:5px; font-size:.85rem; margin:10px 0; }
+  .pos { color:var(--green); } .neg { color:var(--red); }
+  footer { text-align:center; padding:20px; font-size:.8rem; color:#57606a; }
+  a { color:var(--blue); }
+  code { background:#eaf0f8; padding:1px 4px; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tyler Nelson – Financial Analysis Website</h1>
+  <p>Risk, return, performance and valuation calculations · Rogers State University</p>
+</header>
+
+<nav>
+  <button class="active" data-page="home">Home</button>
+  <button data-page="about">About</button>
+  <button data-page="analysis">Financial Analysis</button>
+  <button data-page="valuation">Firm Characteristics</button>
+  <button data-page="contact">Contact</button>
+</nav>
+
+<main>
+<!-- ================= HOME ================= -->
+<section id="home" class="page active">
+  <div class="card">
+    <h2>Welcome</h2>
+    <p>This website performs common financial calculations used in investment analysis. Upload historical price data from Nasdaq.com for one or two stocks and a market benchmark, choose a date range, and the site calculates:</p>
+    <ul>
+      <li><b>Risk and return measures:</b> beta, CAPM (Jensen's) alpha, volatility and correlation</li>
+      <li><b>Performance measures:</b> holding-period return, annualized return, excess return over the benchmark, Sharpe ratio and Treynor ratio</li>
+      <li><b>Time-series and cross-sectional analysis:</b> returns over any date range, a side-by-side comparison of stocks, and a two-stock portfolio using weights you choose</li>
+      <li><b>Market and firm characteristics:</b> market capitalization, P/E ratio, dividend yield and book-to-market ratio</li>
+    </ul>
+    <p>Go to the <b>Financial Analysis</b> tab to begin. Sample data is preloaded so you can see how it works right away.</p>
+    <p class="note">For educational purposes only. Not investment advice.</p>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section id="about" class="page">
+  <div class="card">
+    <h2>About</h2>
+    <p><b>Student:</b> Tyler Nelson</p>
+    <p><b>School:</b> Rogers State University</p>
+    <p>This website was built for the AI Project – Financial Analysis Website, with help from AI tools (Claude). It is a static site hosted on GitHub Pages. All calculations run directly in the browser using JavaScript, so no server is needed. Historical price data comes from <a href="https://www.nasdaq.com/market-activity/quotes/historical" target="_blank">Nasdaq.com</a>.</p>
+
+    <h3>Methodology and Formulas</h3>
+    <p class="note">P = closing price, R = periodic (daily) return, n = number of return periods, N = periods per year (252 for daily data), T = length of the period in years, R<sub>f</sub> = annual risk-free rate.</p>
+    <ul>
+      <li><b>Periodic return:</b> R<sub>t</sub> = P<sub>t</sub> / P<sub>t−1</sub> − 1</li>
+      <li><b>Holding-period return (HPR):</b> P<sub>end</sub> / P<sub>start</sub> − 1</li>
+      <li><b>Annualized return (geometric):</b> (1 + HPR)<sup>1/T</sup> − 1, where T = calendar days ÷ 365.25</li>
+      <li><b>Volatility (annualized):</b> σ = sample standard deviation of R × √N</li>
+      <li><b>Beta:</b> β = Cov(R<sub>i</sub>, R<sub>m</sub>) / Var(R<sub>m</sub>), the slope of a regression of the stock's returns on the market's returns</li>
+      <li><b>CAPM (Jensen's) alpha (annualized):</b> α = [ mean(R<sub>i</sub> − r<sub>f</sub>) − β × mean(R<sub>m</sub> − r<sub>f</sub>) ] × N, where r<sub>f</sub> = R<sub>f</sub> ÷ N is the risk-free rate per period</li>
+      <li><b>Correlation:</b> ρ = Cov(R<sub>i</sub>, R<sub>j</sub>) / (σ<sub>i</sub> σ<sub>j</sub>)</li>
+      <li><b>Excess return over benchmark:</b> annualized return of the asset − annualized return of the benchmark</li>
+      <li><b>Sharpe ratio:</b> mean annual excess return over R<sub>f</sub> ÷ annualized volatility = [ mean(R − r<sub>f</sub>) × N ] / σ</li>
+      <li><b>Treynor ratio:</b> [ mean(R − r<sub>f</sub>) × N ] / β</li>
+      <li><b>Portfolio return:</b> R<sub>p,t</sub> = w<sub>1</sub>R<sub>1,t</sub> + w<sub>2</sub>R<sub>2,t</sub>, with w<sub>1</sub> + w<sub>2</sub> = 1 (weights are restored every period, i.e. rebalanced daily)</li>
+      <li><b>Market capitalization:</b> share price × shares outstanding</li>
+      <li><b>P/E ratio:</b> share price ÷ earnings per share (trailing 12 months)</li>
+      <li><b>Dividend yield:</b> annual dividend per share ÷ share price</li>
+      <li><b>Book-to-market ratio:</b> book value of equity ÷ market capitalization</li>
+    </ul>
+    <h3>Notes and Limitations</h3>
+    <ul>
+      <li>Nasdaq.com prices are closing prices that are <b>not adjusted for dividends</b>. Returns therefore measure price appreciation only and slightly understate total return for dividend-paying stocks. Prices are adjusted for stock splits.</li>
+      <li>Returns are calculated only on dates where every uploaded security has a price.</li>
+      <li>Sharpe, Treynor and alpha use the arithmetic mean of periodic returns (the standard textbook approach). The annualized return uses geometric compounding, so the two can differ slightly.</li>
+      <li>Annualizing results for periods shorter than one year can exaggerate them.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= ANALYSIS ================= -->
+<section id="analysis" class="page">
+  <div class="card">
+    <h2>Financial Analysis – Inputs</h2>
+    <div class="steps">
+      <b>How to get free data from Nasdaq.com:</b>
+      <ol>
+        <li>Go to <a href="https://www.nasdaq.com/market-activity/quotes/historical" target="_blank">nasdaq.com/market-activity/quotes/historical</a> and search for a ticker (for example <code>AAPL</code>).</li>
+        <li>On the stock's <b>Historical Quotes</b> page, choose a time range (1M, 6M, YTD, 1Y, 5Y or MAX, up to about 10 years).</li>
+        <li>Click <b>Download Data</b>. A file named something like <code>HistoricalData_1728...csv</code> downloads.</li>
+        <li>Repeat for your second stock (optional) and for the benchmark. Use <code>SPY</code> (the S&amp;P 500 ETF) as the market benchmark. Choose the <b>same time range</b> for every file.</li>
+        <li>Drag each file onto its box below, or click the box to browse. Then <b>type the ticker</b> in the name box, since Nasdaq's file names don't include it.</li>
+        <li>Enter the risk-free rate (the current 3-month Treasury bill yield), pick a date range, and click <b>Calculate</b>.</li>
+      </ol>
+    </div>
+    <p id="sampleBanner" class="banner">⚠ Currently showing <b>simulated sample data</b>, not real prices. Upload your own Nasdaq.com files to replace it.</p>
+
+    <div class="grid">
+      <div>
+        <label>Stock 1 (required)</label>
+        <div class="drop" data-key="1"><div class="big">📄</div><div>Drop CSV here or click to browse</div><div class="st" id="st1"></div></div>
+        <label>Ticker</label><input id="name1" value="STOCK A">
+        <details><summary>Or paste data manually</summary><textarea id="csv1"></textarea></details>
+      </div>
+      <div>
+        <label>Stock 2 (optional)</label>
+        <div class="drop" data-key="2"><div class="big">📄</div><div>Drop CSV here or click to browse</div><div class="st" id="st2"></div></div>
+        <label>Ticker</label><input id="name2" value="STOCK B">
+        <details><summary>Or paste data manually</summary><textarea id="csv2"></textarea></details>
+        <button class="btn small secondary" id="clear2">Remove Stock 2</button>
+      </div>
+      <div>
+        <label>Market benchmark (required, use SPY)</label>
+        <div class="drop" data-key="M"><div class="big">📈</div><div>Drop CSV here or click to browse</div><div class="st" id="stM"></div></div>
+        <label>Ticker</label><input id="nameM" value="MARKET INDEX">
+        <details><summary>Or paste data manually</summary><textarea id="csvM"></textarea></details>
+      </div>
+    </div>
+    <input type="file" id="filePicker" accept=".csv,text/csv" style="display:none">
+
+    <div class="grid" style="margin-top:10px">
+      <div><label>Start date</label><input type="date" id="start"></div>
+      <div><label>End date</label><input type="date" id="end"></div>
+      <div><label>Risk-free rate (annual %)</label><input type="number" id="rf" value="4.0" step="0.01"></div>
+      <div><label>Portfolio weight in Stock 1: <span id="wLabel">60% / 40%</span></label><input type="range" id="w1" value="60" min="0" max="100" step="5"></div>
+    </div>
+    <label>Quick date range</label>
+    <div class="presets">
+      <button data-y="1">Last 1 year</button><button data-y="3">Last 3 years</button>
+      <button data-y="5">Last 5 years</button><button data-y="0">All available data</button>
+    </div>
+    <button class="btn" id="runBtn">Calculate</button>
+    <button class="btn secondary" id="sampleBtn">Reload sample data</button>
+    <p id="err" class="error"></p>
+  </div>
+
+  <div id="results" style="display:none">
+    <div class="card">
+      <h2>Key Results – <span id="hdrName"></span></h2>
+      <p class="note" id="periodInfo"></p>
+      <div class="grid" id="metrics"></div>
+    </div>
+    <div class="card">
+      <h3>Performance and Risk Comparison</h3>
+      <div class="tablewrap"><table id="perfTable"></table></div>
+      <p class="note">Alpha, beta, excess return and Treynor are measured against the benchmark. Mean return = arithmetic average periodic return × periods per year.</p>
+    </div>
+    <div class="card">
+      <h3>Correlation Matrix</h3>
+      <div class="tablewrap"><table id="corrTable"></table></div>
+    </div>
+    <div class="card">
+      <h3>Growth of $10,000</h3>
+      <canvas id="growthChart" height="110"></canvas>
+    </div>
+    <div class="card">
+      <h3>Period Returns</h3>
+      <canvas id="retChart" height="110"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VALUATION ================= -->
+<section id="valuation" class="page">
+  <div class="card">
+    <h2>Market and Firm Characteristics</h2>
+    <p class="note">Enter figures from Nasdaq.com (the stock's Summary page), the company's annual report, or SEC EDGAR. Use the same units for book value and shares (both in millions). Results update as you type.</p>
+    <div class="grid">
+      <div><label>Company name / ticker</label><input id="vName" value="Example Corp"></div>
+      <div><label>Share price ($)</label><input type="number" id="vPrice" value="150"></div>
+      <div><label>Shares outstanding (millions)</label><input type="number" id="vShares" value="1000"></div>
+      <div><label>Earnings per share, trailing 12 months ($)</label><input type="number" id="vEps" value="6"></div>
+      <div><label>Annual dividend per share ($)</label><input type="number" id="vDiv" value="2.4"></div>
+      <div><label>Total shareholders' equity / book value ($ millions)</label><input type="number" id="vBook" value="45000"></div>
+    </div>
+    <div id="valResults" style="margin-top:16px"></div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact" class="page">
+  <div class="card">
+    <h2>Contact</h2>
+    <p><b>Name:</b> Tyler Nelson</p>
+    <p><b>Email:</b> <a href="mailto:tyler.nelly@icloud.com">tyler.nelly@icloud.com</a></p>
+    <p><b>School:</b> Rogers State University</p>
+  </div>
+</section>
+</main>
+
+<footer>© 2026 Tyler Nelson · Rogers State University · Built for educational purposes · Not investment advice</footer>
+
+<script>
+/* ===== CALC-START: pure calculation functions (no page access) ===== */
+function splitRow(line) {   // handles quoted fields such as "$1,234.56"
+  const out = []; let cur = "", q = false;
+  for (const ch of line) {
+    if (ch === '"') q = !q;
+    else if ((ch === "," || ch === "\t") && !q) { out.push(cur.trim()); cur = ""; }
+    else cur += ch;
+  }
+  out.push(cur.trim()); return out;
+}
+function parseDate(s) {     // returns "YYYY-MM-DD" without time-zone shifts
+  s = (s || "").trim(); let m;
+  if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  if ((m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/))) {     // Nasdaq: MM/DD/YYYY
+    const y = m[3].length === 2 ? "20" + m[3] : m[3];
+    return `${y}-${m[1].padStart(2,"0")}-${m[2].padStart(2,"0")}`;
+  }
+  const d = new Date(s + " 12:00");
+  if (isNaN(d)) return null;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 3) return null;
+  const hdr = splitRow(lines[0]).map(h => h.toLowerCase().replace(/[*\uFEFF]/g, "").trim());
+  const di = hdr.findIndex(h => h === "date");
+  let pi = hdr.findIndex(h => h === "adj close" || h === "adj. close" || h === "adjusted close");
+  if (pi < 0) pi = hdr.findIndex(h => h === "close/last" || h === "close" || h === "price");
+  if (di < 0 || pi < 0) throw new Error("File needs a 'Date' column and a 'Close/Last' or 'Close' column.");
+  const map = {};
+  for (const l of lines.slice(1)) {
+    const c = splitRow(l);
+    const d = parseDate(c[di]); const p = parseFloat((c[pi] || "").replace(/[$,\s]/g, ""));
+    if (d && isFinite(p) && p > 0) map[d] = p;
+  }
+  return map;
+}
+const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+const cov  = (a, b) => { const ma = mean(a), mb = mean(b); return a.reduce((s, x, i) => s + (x - ma) * (b[i] - mb), 0) / (a.length - 1); };
+const sd   = a => Math.sqrt(cov(a, a));
+const corr = (a, b) => cov(a, b) / (sd(a) * sd(b));
+const rets = p => p.slice(1).map((x, i) => x / p[i] - 1);
+
+// Periods per year from the typical spacing between dates
+function periodsPerYear(dates) {
+  const gaps = dates.slice(1).map((d, i) => (Date.parse(d) - Date.parse(dates[i])) / 864e5).sort((a, b) => a - b);
+  const g = gaps[Math.floor(gaps.length / 2)];
+  return g <= 4 ? 252 : g <= 10 ? 52 : g <= 45 ? 12 : g <= 120 ? 4 : 1;
+}
+
+// prices: { name: {date: price} }, first key = stock 1, optional second = stock 2; market separate
+function analyze({ s1, s2, mk, n1, n2, nM, start, end, rfAnnual, w }) {
+  const dates = Object.keys(s1).filter(d => d in mk && (!s2 || d in s2) && d >= (start || "0000") && d <= (end || "9999")).sort();
+  if (dates.length < 3) throw new Error("Fewer than 3 matching dates in this range. Make sure the files cover overlapping dates.");
+  const years = (Date.parse(dates.at(-1)) - Date.parse(dates[0])) / (365.25 * 864e5);
+  const N = periodsPerYear(dates);
+  const rfP = rfAnnual / N;
+
+  const rM = rets(dates.map(d => mk[d]));
+  const series = [{ name: n1, r: rets(dates.map(d => s1[d])) }];
+  if (s2) {
+    series.push({ name: n2, r: rets(dates.map(d => s2[d])) });
+    series.push({ name: `Portfolio (${Math.round(w*100)}% / ${Math.round(100 - w*100)}%)`, r: series[0].r.map((x, i) => w * x + (1 - w) * series[1].r[i]), isPort: true });
+  }
+  series.push({ name: nM, r: rM, isMkt: true });
+
+  const mktHpr = rM.reduce((g, x) => g * (1 + x), 1) - 1;
+  const mktAnn = Math.pow(1 + mktHpr, 1 / years) - 1;
+  const mktExcessMean = mean(rM.map(x => x - rfP));
+  for (const s of series) {
+    s.hpr = s.r.reduce((g, x) => g * (1 + x), 1) - 1;
+    s.ann = Math.pow(1 + s.hpr, 1 / years) - 1;
+    s.meanAnn = mean(s.r) * N;
+    s.vol = sd(s.r) * Math.sqrt(N);
+    s.beta = cov(s.r, rM) / cov(rM, rM);
+    const exMean = mean(s.r.map(x => x - rfP));             // mean excess return per period
+    s.alpha = (exMean - s.beta * mktExcessMean) * N;          // Jensen's alpha, annualized
+    s.excess = s.ann - mktAnn;                                // vs benchmark, annualized
+    s.excessHpr = s.hpr - mktHpr;                             // vs benchmark, whole period
+    s.sharpe = (exMean * N) / s.vol;
+    s.treynor = (exMean * N) / s.beta;
+  }
+  return { dates, years, N, series };
+}
+function firmMetrics({ price, shares, eps, div, book }) {
+  const mcap = price * shares;
+  return { mcap, pe: eps > 0 ? price / eps : NaN, earnYield: eps / price, divYield: div / price,
+           btm: book / mcap, ptb: mcap / book, bvps: book / shares };
+}
+/* ===== CALC-END ===== */
+
+const $ = id => document.getElementById(id);
+const pct = (x, d = 2) => isFinite(x) ? (x * 100).toFixed(d) + "%" : "n/a";
+const num = (x, d = 2) => isFinite(x) ? x.toFixed(d) : "n/a";
+const cls = x => x >= 0 ? "pos" : "neg";
+let charts = [];
+
+// ---------- Tabs ----------
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  $(b.dataset.page).classList.add("active");
+  if (b.dataset.page === "analysis") run();
+}));
+
+// ---------- File upload / drag-and-drop ----------
+let pickKey = null;
+function loadFile(key, file) {
+  const r = new FileReader();
+  r.onload = () => {
+    $("csv" + key).value = r.result;
+    const base = file.name.replace(/\.csv$/i, "").replace(/\s*\(\d+\)$/, "");
+    const nameBox = $("name" + key);
+    if (!/^historicaldata/i.test(base)) nameBox.value = base.toUpperCase();   // e.g. AAPL.csv
+    else if (/^(STOCK [AB]|MARKET INDEX)$/.test(nameBox.value)) { nameBox.value = ""; nameBox.placeholder = "Type the ticker, e.g. AAPL"; }
+    sampleBanner.style.display = "none";
+    updateStatus(key, file.name);
+    autoDates();
+    run();
+    if (!nameBox.value) nameBox.focus();
+  };
+  r.readAsText(file);
+}
+function updateStatus(key, label) {
+  const box = document.querySelector(`.drop[data-key="${key}"]`);
+  const txt = $("csv" + key).value.trim();
+  if (!txt) { box.classList.remove("loaded"); $("st" + key).textContent = ""; return; }
+  try {
+    const d = Object.keys(parseCSV(txt) || {}).sort();
+    if (!d.length) throw new Error("No price rows found.");
+    box.classList.add("loaded");
+    $("st" + key).textContent = `✔ ${label ? label + " · " : ""}${d.length} rows · ${d[0]} to ${d.at(-1)}`;
+  } catch (e) { box.classList.remove("loaded"); $("st" + key).textContent = "⚠ " + e.message; }
+}
+document.querySelectorAll(".drop").forEach(box => {
+  const key = box.dataset.key;
+  box.onclick = () => { pickKey = key; filePicker.value = ""; filePicker.click(); };
+  box.ondragover = e => { e.preventDefault(); box.classList.add("over"); };
+  box.ondragleave = () => box.classList.remove("over");
+  box.ondrop = e => { e.preventDefault(); box.classList.remove("over"); if (e.dataTransfer.files[0]) loadFile(key, e.dataTransfer.files[0]); };
+  $("csv" + key).oninput = () => { sampleBanner.style.display = "none"; updateStatus(key, "pasted"); autoDates(); };
+});
+filePicker.onchange = () => { if (filePicker.files[0]) loadFile(pickKey, filePicker.files[0]); };
+clear2.onclick = () => { csv2.value = ""; name2.value = ""; updateStatus("2"); autoDates(); run(); };
+
+// ---------- Dates ----------
+function commonDates() {
+  const maps = ["1", "2", "M"].map(k => $("csv" + k).value.trim() ? parseCSV($("csv" + k).value) : null).filter(Boolean);
+  if (!maps.length) return [];
+  return Object.keys(maps[0]).filter(d => maps.every(m => d in m)).sort();
+}
+function autoDates() {
+  try { const d = commonDates(); if (d.length) { start.value = d[0]; end.value = d.at(-1); } } catch (e) {}
+}
+document.querySelectorAll(".presets button").forEach(b => b.onclick = () => {
+  let d; try { d = commonDates(); } catch (e) { return; }
+  if (!d.length) return;
+  const last = d.at(-1), y = +b.dataset.y;
+  end.value = last;
+  if (y === 0) start.value = d[0];
+  else {
+    const iso = (+last.slice(0, 4) - y) + last.slice(4);
+    start.value = d.find(x => x >= iso) || d[0];
+  }
+  run();
+});
+w1.oninput = () => { wLabel.textContent = `${w1.value}% / ${100 - w1.value}%`; run(); };
+[start, end, rf, name1, name2, nameM].forEach(el => el.addEventListener("change", run));
+
+// ---------- Sample (simulated) data, daily, in Nasdaq format ----------
+function makeSample() {
+  let seed = 42;
+  const rand = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const normal = () => Math.sqrt(-2 * Math.log(rand())) * Math.cos(2 * Math.PI * rand());
+  let pA = 100, pB = 50, pM = 400;
+  const rows = { a: [], b: [], m: [] };
+  const d = new Date(Date.UTC(2021, 0, 4));
+  const fmt = x => `${String(x.getUTCMonth()+1).padStart(2,"0")}/${String(x.getUTCDate()).padStart(2,"0")}/${x.getUTCFullYear()}`;
+  let first = true;
+  while (d < new Date(Date.UTC(2026, 0, 1))) {
+    if (d.getUTCDay() % 6 !== 0) {
+      if (!first) {
+        const rm = 0.0004 + 0.011 * normal();
+        pM *= 1 + rm; pA *= 1 + 0.0002 + 1.3 * rm + 0.012 * normal(); pB *= 1 + 0.0001 + 0.7 * rm + 0.01 * normal();
+      }
+      first = false;
+      rows.a.unshift(`${fmt(d)},$${pA.toFixed(2)}`); rows.b.unshift(`${fmt(d)},$${pB.toFixed(2)}`); rows.m.unshift(`${fmt(d)},$${pM.toFixed(2)}`);
+    }
+    d.setUTCDate(d.getUTCDate() + 1);
+  }
+  const h = "Date,Close/Last\n";
+  csv1.value = h + rows.a.join("\n"); csv2.value = h + rows.b.join("\n"); csvM.value = h + rows.m.join("\n");
+  name1.value = "STOCK A"; name2.value = "STOCK B"; nameM.value = "MARKET INDEX";
+  sampleBanner.style.display = "block";
+  ["1", "2", "M"].forEach(k => updateStatus(k, "sample data"));
+  autoDates();
+}
+
+// ---------- Run analysis ----------
+function run() {
+  err.textContent = "";
+  try {
+    const s1 = csv1.value.trim() ? parseCSV(csv1.value) : null, mk = csvM.value.trim() ? parseCSV(csvM.value) : null;
+    if (!s1 || !mk) throw new Error("Stock 1 and the benchmark both need data.");
+    const s2 = csv2.value.trim() ? parseCSV(csv2.value) : null;
+    const n1 = name1.value || "Stock 1", n2 = name2.value || "Stock 2", nM = nameM.value || "Benchmark";
+    const res = analyze({ s1, s2, mk, n1, n2, nM, start: start.value, end: end.value,
+                          rfAnnual: (parseFloat(rf.value) || 0) / 100, w: Math.min(Math.max(+w1.value / 100, 0), 1) });
+    const { dates, years, N, series } = res;
+    const freq = { 252: "daily", 52: "weekly", 12: "monthly", 4: "quarterly", 1: "annual" }[N];
+
+    const a = series[0];
+    hdrName.textContent = n1;
+    periodInfo.textContent = `Period: ${dates[0]} to ${dates.at(-1)} · ${dates.length - 1} ${freq} returns · ${years.toFixed(2)} years · risk-free rate ${(+rf.value || 0).toFixed(2)}%`;
+    const m = [["Holding-Period Return", pct(a.hpr), a.hpr], ["Annualized Return", pct(a.ann), a.ann], ["Volatility (annualized)", pct(a.vol)], ["Beta vs " + nM, num(a.beta)],
+               ["CAPM Alpha (annualized)", pct(a.alpha), a.alpha], ["Excess Return vs " + nM + " (annualized)", pct(a.excess), a.excess], ["Sharpe Ratio", num(a.sharpe)], ["Treynor Ratio", num(a.treynor, 4)]];
+    metrics.innerHTML = m.map(([l, v, s]) => `<div class="metric"><div class="v ${s !== undefined ? cls(s) : ""}">${v}</div><div class="l">${l}</div></div>`).join("");
+
+    perfTable.innerHTML = `<tr><th>Asset</th><th>Holding-Period Return</th><th>Annualized Return</th><th>Mean Return (ann.)</th><th>Volatility</th><th>Beta</th><th>Alpha</th><th>Excess vs ${nM}</th><th>Sharpe</th><th>Treynor</th></tr>` +
+      series.map(s => `<tr><td>${s.name}</td><td class="${cls(s.hpr)}">${pct(s.hpr)}</td><td class="${cls(s.ann)}">${pct(s.ann)}</td><td>${pct(s.meanAnn)}</td><td>${pct(s.vol)}</td><td>${num(s.beta)}</td>
+        <td>${s.isMkt ? "—" : pct(s.alpha)}</td><td>${s.isMkt ? "—" : pct(s.excess)}</td><td>${num(s.sharpe)}</td><td>${num(s.treynor, 4)}</td></tr>`).join("");
+
+    const cs = series.filter(s => !s.isPort);
+    corrTable.innerHTML = `<tr><th></th>${cs.map(s => `<th>${s.name}</th>`).join("")}</tr>` +
+      cs.map(r => `<tr><td><b>${r.name}</b></td>${cs.map(c => `<td>${num(corr(r.r, c.r), 3)}</td>`).join("")}</tr>`).join("");
+
+    if (window.Chart) {
+      charts.forEach(c => c.destroy()); charts = [];
+      const colors = ["#1f6feb", "#e3772b", "#8250df", "#57606a"];
+      charts.push(new Chart(growthChart, { type: "line", data: { labels: dates, datasets: series.map((s, i) => {
+        let v = 10000; return { label: s.name, data: [10000, ...s.r.map(x => (v *= 1 + x))], borderColor: colors[i], pointRadius: 0, borderWidth: 2 }; }) },
+        options: { animation: false, scales: { y: { ticks: { callback: v => "$" + v.toLocaleString() } } } } }));
+      charts.push(new Chart(retChart, { type: "bar", data: { labels: dates.slice(1), datasets: cs.map((s, i) => ({ label: s.name, data: s.r.map(x => x * 100), backgroundColor: s.isMkt ? colors[3] : colors[i] })) },
+        options: { animation: false, scales: { y: { ticks: { callback: v => v + "%" } } } } }));
+    }
+    results.style.display = "block";
+  } catch (e) { err.textContent = e.message; results.style.display = "none"; }
+}
+
+// ---------- Firm characteristics (live) ----------
+function valuation() {
+  const g = id => parseFloat($(id).value);
+  const f = firmMetrics({ price: g("vPrice"), shares: g("vShares"), eps: g("vEps"), div: g("vDiv") || 0, book: g("vBook") });
+  const rows = [
+    ["Market Capitalization", "Share Price × Shares Outstanding", isFinite(f.mcap) ? "$" + f.mcap.toLocaleString(undefined, { maximumFractionDigits: 0 }) + " million" : "n/a"],
+    ["Price-to-Earnings (P/E)", "Share Price ÷ EPS", isFinite(f.pe) ? num(f.pe) + "×" : "n/a (EPS must be positive)"],
+    ["Earnings Yield", "EPS ÷ Share Price", pct(f.earnYield)],
+    ["Dividend Yield", "Annual Dividend per Share ÷ Share Price", pct(f.divYield)],
+    ["Book-to-Market", "Book Value of Equity ÷ Market Cap", num(f.btm, 3)],
+    ["Price-to-Book", "Market Cap ÷ Book Value of Equity", isFinite(f.ptb) ? num(f.ptb) + "×" : "n/a"],
+    ["Book Value per Share", "Book Value of Equity ÷ Shares Outstanding", isFinite(f.bvps) ? "$" + num(f.bvps) : "n/a"]];
+  valResults.innerHTML = `<h3>${vName.value}</h3><table><tr><th>Measure</th><th>Formula</th><th>Value</th></tr>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td><b>${r[2]}</b></td></tr>`).join("")}</table>`;
+}
+document.querySelectorAll("#valuation input").forEach(el => el.addEventListener("input", valuation));
+
+runBtn.onclick = run;
+sampleBtn.onclick = () => { makeSample(); run(); };
+makeSample(); run(); valuation();
+</script>
+</body>
+</html>
